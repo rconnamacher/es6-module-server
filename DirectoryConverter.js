@@ -6,11 +6,11 @@ const fs = require("fs-extra");
 const ModuleSpecifierConverter = require("./ModuleSpecifierConverter.js");
 
 module.exports = class DirectoryConverter {
-    constructor(baseDir, options) {
-        this.baseDir = baseDir;
+    constructor(options) {
         this.options = options;
+        this.baseDir = options.baseDir;
 
-        this.moduleSpecifierConverter = new ModuleSpecifierConverter(baseDir, options);
+        this.moduleSpecifierConverter = new ModuleSpecifierConverter(options.baseDir, options);
     }
 
     convertDirectory(destDir, variables) {

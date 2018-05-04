@@ -34,6 +34,9 @@ The `variables` option is used only by the development server middleware to perf
 
 ```js
 module.exports = {
+    // Location of source files relative to the project's root working directory
+   baseDir:  "src/js",
+
     // Used by the Express server middleware to determine
     // variables from the loading page's URL
     variables: {
@@ -90,13 +93,10 @@ const es6ModuleMiddleware = require("es6-module-server/expressMiddleware.js");
 
 const app = express();
 
-app.use("/src/js", es6ModuleMiddleware(
-    /* Location of source files */
-    "src/js",
+// Your configuration file
+const es6ModuleConfig = require("./es6-module-config.js");
 
-    /* Your configuration file */
-    require("./es6-module-config.js")
-));
+app.use(`/${es6ModuleConfig.baseDir}`, es6ModuleMiddleware(es6ModuleConfig);
 
 // Serve all other files not handled by the ES6 Module Middleware
 // (including non-JavaScript files)
@@ -115,8 +115,8 @@ You can use code like the following to create localized clones of your source. T
 ```js
 const DirectoryConverter = require("es6-module-server/DirectoryConverter.js");
 
-// Where your non-localized source lives:
-const source_dir = "src/js";
+// Your configuration file
+const es6ModuleConfig = require("./es6-module-config.js");
 
 // Where to copy localized clones of it:
 const dest_dir = "build/stage";
@@ -124,10 +124,7 @@ const dest_dir = "build/stage";
 // What locales to build:
 const locales = ["en", "fr"];
 
-const converter = new DirectoryConverter(
-    source_dir,
-    require("./es6-module-config.js")
-);
+const converter = new DirectoryConverter(es6ModuleConfig);
 for (let locale of locales) {
     converter.convertDirectory(
         // Destination directory:

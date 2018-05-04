@@ -7,11 +7,12 @@ const assert = require("assert");
 
 const ModuleSpecifierConverter = require("./ModuleSpecifierConverter.js");
 
-module.exports = function es6ModuleMiddleware(baseDir, options) {
+module.exports = function es6ModuleMiddleware(options) {
     const variableDefinitions = options.variables || {};
     const specifiers = options.moduleSpecifiers || {};
+    const baseDir = options.baseDir;
 
-    assert(baseDir && typeof baseDir === "string", "baseDir is required");
+    assert(baseDir && typeof baseDir === "string", "options.baseDir is required");
 
     const _isValidDirname = dirName => /^[\w-_][\w-_.]*$/.test(dirName);
     const _isJSFile = filePath => {
