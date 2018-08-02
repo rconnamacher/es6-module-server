@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("path");
+const assert = require("assert");
 
 const DEFAULT_OPTIONS = {
     variables: {},
@@ -10,35 +11,47 @@ const DEFAULT_OPTIONS = {
 const IMPORT_REGEX = /\bimport\s[^'"`\r\n]*['"`]([^'"`\r\n]+)['"`]/g;
 
 module.exports = class ModuleSpecifierConverter {
-    constructor(baseDir, options) {
+    constructor(options) {
         options = Object.assign({}, DEFAULT_OPTIONS, options);
 
-        this.baseDir = baseDir;
-        this.options = options;
+        this.options = Object.assign({
+            rootDir: ".",
+        }, options);
 
         this.specifiers = options.moduleSpecifiers;
+
+        assert(options.baseDir && typeof options.baseDir === "string", "options.baseDir is required");
     }
 
-    convert(jsSource, filePath, variables, additionalTransformFunc) {
+    convert(jsSource, sourceFilePath, destFilePath, variables, additionalTransformFunc) {
         const specifiers = this.specifiers;
-        const baseDir = this.baseDir;
+        const options = this.options;
+        const baseDir = options.baseDir;
+        const rootDir = options.rootDir;
 
         return jsSource.replace(IMPORT_REGEX, (importStatement, modulePath) => {
             const originalModulePath = modulePath;
             const specifier = modulePath.split("/", 1)[0];
-            if (specifier && specifier[0] !== ".") {
+            if (specifier === "" || specifier && specifier[0] !== "." && specifiers.hasOwnProperty(specifier)) {
                 //console.log(`Specifier: ${specifier}`);
-                if (specifiers.hasOwnProperty(specifier)) {
-                    const replacement = specifiers[specifier](variables);
-                    //console.log("Replacement: ", replacement);
-                    const calculatedPath = modulePath.replace(specifier, path.join(baseDir, replacement));
-                    //console.log(`Replacement in file ${filePath}, specifier=${specifier}`);
 
-                    let relativePath = path.relative(path.dirname(filePath), calculatedPath);
-                    if (relativePath[0] != ".") {
-                        relativePath = "./" + relativePath;
+                if (specifier === "") {
+                    // It starts with '/', resolve relative to rootDir
+                    // (Defaults to current working directory if rootDir isn't set)
+                    modulePath = path.join(rootDir, modulePath);
+                    modulePath = path.relative(path.dirname(destFilePath), modulePath);
+                } else if (specifiers.hasOwnProperty(specifier)) {
+                    // Named specifier, look for replacement pattern
+                    const replacement = specifiers[specifier](variables);
+                    modulePath = modulePath.replace(specifier, path.join(baseDir, replacement));
+                    modulePath = path.relative(path.dirname(sourceFilePath), modulePath);
+                }
+
+                if (modulePath[0] != ".") {
+                    if (modulePath[0] != "/") {
+                        modulePath = "/" + modulePath;
                     }
-                    modulePath = relativePath;
+                    modulePath = "." + modulePath;
                 }
             }
 

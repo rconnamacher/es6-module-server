@@ -1,7 +1,7 @@
 {
     "name": "es6-module-server",
     "description": "Manage native ES6 modules with dynamic includes in bundler-free browser development, and prepare them to be built for release",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "author": "Richard Connamacher <richardconnamacher@gmail.com>",
     "LICENSE": "BSD-2-Clause",
     "engines": {

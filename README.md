@@ -2,16 +2,20 @@
 
 Want to work with browser-native ECMAScript 6 modules, but still need dynamic `import` statements for config and localization?
 
-As of October 2017, three of the four major web browsers allow you to natively work with ECMAScript modules, using `<script type="module">` to load your first JavaScript file and `import` to include other source files from it. You no longer need to muck around with bundlers and source maps when coding in modern JavaScript. But browser support comes with one major limitation: they can't run any kind of code before your `import` statements to figure out where the files live. Dynamic import statements like this will throw an error: ``import `/localized/${LANG}/strings.js` ``.
+As of May 2018, all four major web browsers allow you to natively work with ECMAScript modules, using `<script type="module">` to load your first JavaScript file and `import` to include other source files from it. You no longer need to muck around with bundlers and source maps when coding in modern JavaScript. But browser support comes with one major limitation: they can't run any kind of code before your `import` statements to figure out where the files live. Dynamic import statements like this will throw an error: ``import `/localized/${LANG}/strings.js` ``.
 
-**ES6 Module Server** works around that by translating module names in realtime before serving them to your web browser. It will also translate an entire directory in advance, for deployment or bundling with any standard ES6 bundling tool.
+And secondly, while web browsers understand that module paths starting with `/`, like `import "/node_modules/my-module/foo.js"`, are relative to the _web root_; popular build tools like Closure Compiler treat them as if they’re relative to the root of the _filesystem_.
+
+**ES6 Module Server** works around both issues by translating module names in realtime before serving them to your web browser. It will also translate an entire directory in advance, for deployment or bundling with any standard ES6 bundling tool.
 
 This is good for:
 
  * Localization bundles for regions and languages
- * Environment-specific config files, with different values for development and production.
+ * Environment-specific config files, with different values for development and production
+ * Importing external libraries from `node_modules` and other directories outside your
+   source directory
 
-**This is not a transpiler or bundler.** It keeps your source intact exactly as written, only rewriting the _paths_ inside your import statements so web browsers know where to find your modules.
+**This is not a transpiler or bundler.** It keeps your source intact exactly as written, only rewriting the _paths_ inside your import statements so web browsers and build tools know where to find your modules.
 
 For example, when you load your boot HTML with `?lang=en-uk`, this will then translate `import "localized/strings.js"` to a relative path like `import "../../localized/en-uk/strings.js"`.
 
@@ -36,6 +40,9 @@ The `variables` option is used only by the development server middleware to perf
 module.exports = {
     // Location of source files relative to the project's root working directory
    baseDir:  "src/js",
+
+   // Optional: the directory to resolve module paths starting with "/". Defaults to ".".
+   rootDir: ".",
 
     // Used by the Express server middleware to determine
     // variables from the loading page's URL

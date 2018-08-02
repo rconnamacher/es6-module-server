@@ -55,7 +55,7 @@ module.exports = function es6ModuleMiddleware(options) {
         return variables;
     }
 
-    const moduleSpecifierConverter = new ModuleSpecifierConverter(baseDir, options);
+    const moduleSpecifierConverter = new ModuleSpecifierConverter(options);
 
     return (request, response, next) => {
         if (request.method != "GET") {
@@ -78,7 +78,7 @@ module.exports = function es6ModuleMiddleware(options) {
 
         let jsSource = fs.readFileSync(filePath, {encoding: "utf8"});
         jsSource = moduleSpecifierConverter.convert(
-            jsSource, filePath, variables,
+            jsSource, filePath, filePath, variables,
 
             // Add ?query parameter to module names
             moduleName => {
