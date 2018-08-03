@@ -1,9 +1,9 @@
 {
     "name": "es6-module-server",
-    "description": "Manage native ES6 modules with dynamic includes in bundler-free browser development, and prepare them to be built for release",
-    "version": "0.2.0",
+    "description": "Serve web apps with localized browser-native ES6 modules without transpiling in development, and prepare them to be built for release",
+    "version": "0.2.1",
     "author": "Richard Connamacher <richardconnamacher@gmail.com>",
-    "LICENSE": "BSD-2-Clause",
+    "license": "BSD-2-Clause",
     "engines": {
         "node": ">= 8.0"
     },
@@ -12,7 +12,7 @@
         "url": "https://github.com/rconnamacher/es6-module-server"
     },
     "dependencies": {
-        "fs-extra": "4.0.2",
+        "fs-extra": "7.0.0",
         "klaw-sync": "3.0.2"
     }
 }

@@ -12,8 +12,7 @@ This is good for:
 
  * Localization bundles for regions and languages
  * Environment-specific config files, with different values for development and production
- * Importing external libraries from `node_modules` and other directories outside your
-   source directory
+ * Setting the root `/` directory for your project, and including external module libraries from `/node_modules`.
 
 **This is not a transpiler or bundler.** It keeps your source intact exactly as written, only rewriting the _paths_ inside your import statements so web browsers and build tools know where to find your modules.
 
@@ -27,7 +26,7 @@ This uses Node and NPM. You also need to install the Express package to use this
 
 ```
 npm install express
-npm install https://github.com/rconnamacher/es6-module-server.git
+npm install es6-module-server
 ```
 
 ## Configuration
@@ -118,6 +117,8 @@ app.listen(8080);
 The **DirectoryConverter** class tranlates an entire source directory.
 
 You can use code like the following to create localized clones of your source. They can then be built by any ES6-compliant bundling tool like Closure Compiler, WebPack, and Babel, or hosted in raw format on a static web server.
+
+JavaScript files in your source directory (ending in .js or .mjs) will have their import paths updated for the given configuration and locale. Import paths starting with `/`, such as `import Foo from "/node_modules/example/Foo.js"`, will be turned into relative paths using your `rootDir` configuration.
 
 ```js
 const DirectoryConverter = require("es6-module-server/DirectoryConverter.js");
