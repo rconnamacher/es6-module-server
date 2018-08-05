@@ -118,7 +118,7 @@ The **DirectoryConverter** class tranlates an entire source directory.
 
 You can use code like the following to create localized clones of your source. They can then be built by any ES6-compliant bundling tool like Closure Compiler, WebPack, and Babel, or hosted in raw format on a static web server.
 
-JavaScript files in your source directory (ending in .js or .mjs) will have their import paths updated for the given configuration and locale. Import paths starting with `/`, such as `import Foo from "/node_modules/example/Foo.js"`, will be turned into relative paths using your `rootDir` configuration.
+JavaScript files in your source directory (ending in .js or .mjs) will have their import paths updated for the given configuration and locale. Import paths starting with `/`, such as `import Foo from "/node_modules/example/Foo.js"`, will be turned into relative paths using your `rootDir` configuration. All other file types will be copied as-is.
 
 ```js
 const DirectoryConverter = require("es6-module-server/DirectoryConverter.js");

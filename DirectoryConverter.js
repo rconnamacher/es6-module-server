@@ -12,29 +12,31 @@ module.exports = class DirectoryConverter {
     }
 
     convertDirectory(destDir, variables) {
-        const filterFn = item => path.extname(item.path) === '.js';
-
         const options = Object.assign({
             rootDir: ".",
         }, this.options);
         const sourceDir = options.baseDir;
 
-        // Adjust rootDir to be relative to destDir
-        const inputFilePaths = klawSync(sourceDir, { filter: filterFn });
-
         const moduleSpecifierConverter = new ModuleSpecifierConverter(options);
+
+        const inputFilePaths = klawSync(sourceDir);
+
+        const isJavaScriptFile = filePath => /^\.m?js$/.test(path.extname(filePath));
 
         for (let {path: filePath} of inputFilePaths) {
             const relativeFilePath = path.relative(sourceDir, filePath);
             const destinationFilePath = path.join(destDir, relativeFilePath);
 
-            //console.log(`Converting file path ${relativeFilePath} from ${filePath} to ${destinationFilePath}`);
+            if (isJavaScriptFile(filePath)) {
+                let jsSource = fs.readFileSync(filePath, {encoding: "utf8"});
+                jsSource = moduleSpecifierConverter.convert(jsSource, filePath, destinationFilePath, variables);
 
-            let jsSource = fs.readFileSync(filePath, {encoding: "utf8"});
-            jsSource = moduleSpecifierConverter.convert(jsSource, filePath, destinationFilePath, variables);
-
-            fs.ensureFileSync(destinationFilePath);
-            fs.writeFileSync(destinationFilePath, jsSource);
+                fs.ensureFileSync(destinationFilePath);
+                fs.writeFileSync(destinationFilePath, jsSource);
+            } else {
+                fs.ensureDirSync(path.dirname(destinationFilePath));
+                fs.copyFileSync(filePath, destinationFilePath);
+            }
         }
     }
 }
