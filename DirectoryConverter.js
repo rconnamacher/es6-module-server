@@ -19,7 +19,9 @@ module.exports = class DirectoryConverter {
 
         const moduleSpecifierConverter = new ModuleSpecifierConverter(options);
 
-        const inputFilePaths = klawSync(sourceDir);
+        const inputFilePaths = klawSync(sourceDir, {
+            nodir: true
+        });
 
         const isJavaScriptFile = filePath => /^\.m?js$/.test(path.extname(filePath));
 
