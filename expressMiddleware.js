@@ -78,19 +78,19 @@ module.exports = function es6ModuleMiddleware(options) {
 
         let jsSource = fs.readFileSync(filePath, {encoding: "utf8"});
         jsSource = moduleSpecifierConverter.convert(
-            jsSource, filePath, filePath, variables,
+            jsSource, filePath, variables,
 
             // Add ?query parameter to module names
-            moduleName => {
+            modulePath => {
                 let query = Object.keys(variables)
                     .filter(varName => definitions[varName].type == "query" && variables[varName] !== definitions[varName].default)
                     .map(varName => `${definitions[varName].name}=${variables[varName]}`)
                     .join("&");
 
                 if (query) {
-                    moduleName += (moduleName.includes("?") ? "&" : "?") + query;
+                    modulePath += (modulePath.includes("?") ? "&" : "?") + query;
                 }
-                return moduleName;
+                return modulePath;
             }
         );
 

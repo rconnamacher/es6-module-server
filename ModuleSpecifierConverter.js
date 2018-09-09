@@ -23,7 +23,7 @@ module.exports = class ModuleSpecifierConverter {
         assert(options.baseDir && typeof options.baseDir === "string", "options.baseDir is required");
     }
 
-    convert(jsSource, sourceFilePath, destFilePath, variables, additionalTransformFunc) {
+    convert(jsSource, sourceFilePath, variables, additionalTransformFunc) {
         const specifiers = this.specifiers;
         const options = this.options;
         const baseDir = options.baseDir;
@@ -39,13 +39,21 @@ module.exports = class ModuleSpecifierConverter {
                     // It starts with '/', resolve relative to rootDir
                     // (Defaults to current working directory if rootDir isn't set)
                     modulePath = path.join(rootDir, modulePath);
-                    modulePath = path.relative(path.dirname(destFilePath), modulePath);
+                    // modulePath = path.relative(path.dirname(destFilePath), modulePath);
                 } else if (specifiers.hasOwnProperty(specifier)) {
                     // Named specifier, look for replacement pattern
-                    const replacement = specifiers[specifier](variables);
-                    modulePath = modulePath.replace(specifier, path.join(baseDir, replacement));
-                    modulePath = path.relative(path.dirname(sourceFilePath), modulePath);
+                    let replacement = specifiers[specifier](variables);
+                    if (replacement.startsWith("/")) {
+                        replacement = path.join(rootDir, replacement);
+                    } else {
+                        replacement = path.join(baseDir, replacement);
+                    }
+                    modulePath = modulePath.replace(specifier, replacement);
                 }
+                modulePath = path.relative(path.dirname(sourceFilePath), modulePath);
+
+                // Determine if destination path is inside the directory being moved
+
 
                 if (modulePath[0] != ".") {
                     if (modulePath[0] != "/") {
