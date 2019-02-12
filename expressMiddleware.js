@@ -83,7 +83,7 @@ module.exports = function es6ModuleMiddleware(options) {
             // Add ?query parameter to module names
             modulePath => {
                 let query = Object.keys(variables)
-                    .filter(varName => definitions[varName].type == "query" && variables[varName] !== definitions[varName].default)
+                    .filter(varName => definitions[varName].type == "query")
                     .map(varName => `${definitions[varName].name}=${variables[varName]}`)
                     .join("&");
 
