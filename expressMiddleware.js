@@ -26,6 +26,7 @@ module.exports = function es6ModuleMiddleware(options) {
         return path.join(baseDir, filePath);
     }
     function getVariables(request) {
+        const originalVariables = {};
         const variables = {};
         const requestQuery = request.query;
         const referer = request.get("Referer");
@@ -46,13 +47,15 @@ module.exports = function es6ModuleMiddleware(options) {
                 }
             }
 
-            if (!value || !_isValidDirname(value)) {
+            originalVariables[varName] = value;
+
+            if (value === undefined || !_isValidDirname(value)) {
                 value = definition.default;
             }
 
             variables[varName] = value;
         }
-        return variables;
+        return [variables, originalVariables];
     }
 
     const moduleSpecifierConverter = new ModuleSpecifierConverter(options);
@@ -73,7 +76,7 @@ module.exports = function es6ModuleMiddleware(options) {
             return next();
         }
 
-        const variables = getVariables(request);
+        const [variables, originalVariables] = getVariables(request);
         const definitions = variableDefinitions;
 
         let jsSource = fs.readFileSync(filePath, {encoding: "utf8"});
@@ -84,7 +87,8 @@ module.exports = function es6ModuleMiddleware(options) {
             modulePath => {
                 let query = Object.keys(variables)
                     .filter(varName => definitions[varName].type == "query")
-                    .map(varName => `${definitions[varName].name}=${variables[varName]}`)
+                    .filter(varName => originalVariables[varName] !== undefined)
+                    .map(varName => `${definitions[varName].name}=${originalVariables[varName]}`)
                     .join("&");
 
                 if (query) {
