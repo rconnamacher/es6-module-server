@@ -79,12 +79,6 @@ module.exports = class ModuleSpecifierConverter {
                     )
                 }
 
-                if (additionalTransformFunc) {
-                    modulePathCandidates = modulePathCandidates.map(
-                        modulePath => additionalTransformFunc(modulePath)
-                    );
-                }
-
                 // Find first candidate that exists, or go with first if none exist
                 modulePath = modulePathCandidates[0];
                 for (const candidate of modulePathCandidates) {
@@ -102,6 +96,10 @@ module.exports = class ModuleSpecifierConverter {
                     }
                     modulePath = "." + modulePath;
                 }
+            }
+
+            if (additionalTransformFunc) {
+                modulePath = additionalTransformFunc(modulePath);
             }
 
             if (originalModulePath !== modulePath) {
