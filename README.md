@@ -61,7 +61,12 @@ module.exports = {
     // Used by both the Express Middleware and DirectoryConverter
     // to translate variables into paths
     moduleSpecifiers: {
-        "localized": variables => `localized/${variables.locale}`,
+        // Return an array to specify fallbacks. The first path that exists will be used.
+        "localized": variables => [
+            `localized/${variables.locale}`,                // en-gb
+            `localized/${variables.locale.split('-')[0]}`,  // en
+        ],
+        // Or a string if no fallbacks are needed
         "environment": variables => `env/config.${variables.environment}.js`,
     }
 };
