@@ -23,7 +23,7 @@ module.exports = class DirectoryConverter {
             nodir: true
         });
 
-        const isJavaScriptFile = filePath => /^\.m?js$/.test(path.extname(filePath));
+        const isJavaScriptFile = filePath => /^\.m?jsx?$/.test(path.extname(filePath));
 
         for (let {path: filePath} of inputFilePaths) {
             const relativeFilePath = path.relative(sourceDir, filePath);
