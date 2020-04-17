@@ -42,8 +42,6 @@ module.exports = function es6ModuleMiddleware(options) {
                     value = requestQuery[definition.name];
                 } else if (refererSearchParams && refererSearchParams.has(definition.name)) {
                     value = refererSearchParams.get(definition.name);
-                } else if (!referer) {
-                    console.warn("Warning: no Referer header detected");
                 }
             }
 
