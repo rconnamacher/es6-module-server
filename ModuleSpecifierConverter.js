@@ -9,7 +9,7 @@ const DEFAULT_OPTIONS = {
     moduleSpecifiers: {},
 }
 
-const IMPORT_REGEX = /\bimport\s[^'"`\r\n]*['"`]([^'"`\r\n]+)['"`]/g;
+const IMPORT_REGEX = /\bimport\s+([\w\s{},*]*\s+from\s+)?['"`]([^'"`\r\n]+)['"`]/g
 
 function getSpecifierReplacements(replacementFunction, variables) {
     let replacements;
@@ -50,7 +50,7 @@ module.exports = class ModuleSpecifierConverter {
         const baseDir = options.baseDir;
         const rootDir = options.rootDir;
 
-        return jsSource.replace(IMPORT_REGEX, (importStatement, modulePath) => {
+        return jsSource.replace(IMPORT_REGEX, (importStatement, fromGroup, modulePath) => {
             const originalModulePath = modulePath;
             const specifier = modulePath.split("/", 1)[0];
             let modulePathCandidates = [modulePath];
