@@ -10,6 +10,7 @@ const DEFAULT_OPTIONS = {
 }
 
 const IMPORT_REGEX = /\bimport\s+([\w\s{},*]*\s+from\s+)?['"`]([^'"`\r\n]+)['"`]/g
+const DYNAMIC_IMPORT_REGEX = /\bimport\s*\(\s*['"`]([^'"`\r\n]+)['"`]\s*\)/g
 
 function getSpecifierReplacements(replacementFunction, variables) {
     let replacements;
@@ -50,8 +51,7 @@ module.exports = class ModuleSpecifierConverter {
         const baseDir = options.baseDir;
         const rootDir = options.rootDir;
 
-        return jsSource.replace(IMPORT_REGEX, (importStatement, fromGroup, modulePath) => {
-            const originalModulePath = modulePath;
+        function rewriteModulePath(modulePath) {
             const specifier = modulePath.split("/", 1)[0];
             let modulePathCandidates = [modulePath];
 
@@ -102,8 +102,22 @@ module.exports = class ModuleSpecifierConverter {
                 modulePath = additionalTransformFunc(modulePath);
             }
 
-            if (originalModulePath !== modulePath) {
-                importStatement = importStatement.replace(originalModulePath, modulePath);
+            return modulePath;
+        }
+
+        return jsSource.replace(IMPORT_REGEX, (importStatement, fromGroup, modulePath) => {
+            const newModulePath = rewriteModulePath(modulePath);
+
+            if (newModulePath !== modulePath) {
+                importStatement = importStatement.replace(modulePath, newModulePath);
+            }
+
+            return importStatement;
+        }).replace(DYNAMIC_IMPORT_REGEX, (importStatement, modulePath) => {
+            const newModulePath = rewriteModulePath(modulePath);
+
+            if (newModulePath !== modulePath) {
+                importStatement = importStatement.replace(modulePath, newModulePath);
             }
 
             return importStatement;
