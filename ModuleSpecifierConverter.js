@@ -10,6 +10,7 @@ const DEFAULT_OPTIONS = {
 }
 
 const IMPORT_REGEX = /\bimport\s+([\w\s{},*]*\s+from\s+)?['"`]([^'"`\r\n]+)['"`]/g
+const EXPORT_REGEX = /\bexport\s+[\w\s{},*]+\s+from\s+['"`]([^'"`\r\n]+)['"`]/g
 const DYNAMIC_IMPORT_REGEX = /\bimport\s*\(\s*['"`]([^'"`\r\n]+)['"`]\s*\)/g
 
 function getSpecifierReplacements(replacementFunction, variables) {
@@ -105,22 +106,21 @@ module.exports = class ModuleSpecifierConverter {
             return modulePath;
         }
 
-        return jsSource.replace(IMPORT_REGEX, (importStatement, fromGroup, modulePath) => {
+        const rewriteImport = (importStatement, modulePath) => {
             const newModulePath = rewriteModulePath(modulePath);
-
             if (newModulePath !== modulePath) {
                 importStatement = importStatement.replace(modulePath, newModulePath);
             }
-
             return importStatement;
-        }).replace(DYNAMIC_IMPORT_REGEX, (importStatement, modulePath) => {
-            const newModulePath = rewriteModulePath(modulePath);
+        }
 
-            if (newModulePath !== modulePath) {
-                importStatement = importStatement.replace(modulePath, newModulePath);
-            }
-
-            return importStatement;
-        });
+        return jsSource
+            .replace(IMPORT_REGEX,
+                (statement, _, modulePath) => rewriteImport(statement, modulePath),
+            ).replace(EXPORT_REGEX,
+                (statement, modulePath) => rewriteImport(statement, modulePath),
+            ).replace(DYNAMIC_IMPORT_REGEX,
+                (statement, modulePath) => rewriteImport(statement, modulePath),
+            );
     }
 }

@@ -1,7 +1,7 @@
 {
     "name": "es6-module-server",
     "description": "Serve web apps with localized browser-native ES6 modules without transpiling in development, and prepare them to be built for release",
-    "version": "0.2.13",
+    "version": "0.2.14",
     "author": "Richard Connamacher <richardconnamacher@gmail.com>",
     "license": "BSD-2-Clause",
     "engines": {
